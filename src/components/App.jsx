@@ -2,14 +2,14 @@ import { Component } from 'react';
 import { Button } from './Button/Button';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Searchbar } from './Searchbar/Searchbar';
-import css from './App.module.css';
+import css from 'App.module.css';
 import { getAPI } from '../pixabay-api';
 import toast, { Toaster } from 'react-hot-toast';
 
 export class App extends Component {
   state = {
-    searchQuery: '',
-    currentPage: 1,
+    search: '',
+    page: 1,
     images: [],
     isLoading: false,
     isError: false,
@@ -17,48 +17,49 @@ export class App extends Component {
   };
 
   componentDidUpdate = async (_prevProps, prevState) => {
-    const { searchQuery, currentPage } = this.state;
+    const { search, page } = this.state;
 
-    if (
-      prevState.searchQuery !== searchQuery ||
-      prevState.currentPage !== currentPage
-    ) {
-      await this.fetchImages(searchQuery, currentPage);
+    if (prevState.search !== search || prevState.page !== page) {
+      await this.fetchImages(search, page);
     }
   };
 
-  fetchImages = async (searchQuery, currentPage) => {
+  fetchImages = async (search, page) => {
     // implement this code
     try {
       this.setState({ isLoading: true });
       // fetch data from API
 
-      const fetchedImages = await getAPI(searchQuery, currentPage);
+      const fetchedImages = await getAPI(search, page);
 
       const { hits, totalHits } = fetchedImages;
 
       console.log(hits, totalHits);
 
-      // Display an error message, if there is no match with the searchQuery
+      // Display an error message, if there is no match with the search
       if (hits.length === 0) {
         toast.error(
-          'Sorry, there are no images matching your searchQuery query. Please try again.'
+          'Sorry, there are no images matching your search searchQuery. Please try again.'
         );
         return;
       }
 
-      // Display a success message if it's the first currentPage
-      if (currentPage === 1) {
-        toast.success(`Hooray! We found ${totalHits} images!`)
-          };
+      // Display a success message if it's the first current page
+      if (page === 1) {
+        toast.success(`Hooray! We found ${totalHits} images!`);
       }
 
-      // Display a message if currentPage is already at the end of data (12 = per_page based on API call)
-      if (currentPage * 12 >= totalHits) {
+      // Display a message if page is already at the end of data (12 = per_page based on API call)
+      if (page * 12 >= totalHits) {
         this.setState({ isEnd: true });
-        toast(
-          "We're sorry, but you've reached the end of searchQuery results."
-        );
+        toast("We're sorry, but you've reached the end of search results.", {
+          icon: '👏',
+          style: {
+            borderRadius: '10px',
+            background: '#333',
+            color: '#fff',
+          },
+        });
       }
       // Update the state with the new images
       this.setState(prevState => ({
@@ -74,17 +75,17 @@ export class App extends Component {
   handleSubmit = e => {
     e.preventDefault();
 
-    const { searchQuery } = this.state;
-    const newSearch = e.target.searchQuery.value.trim().toLowerCase();
+    const { search } = this.state;
+    const newSearch = e.target.search.value.trim().toLowerCase();
 
-    // if new searchQuery string is different from the current searchQuery string saved in state
-    if (newSearch !== searchQuery) {
-      this.setState({ searchQuery: newSearch, currentPage: 1, images: [] });
+    // if new search string is different from the current search string saved in state
+    if (newSearch !== search) {
+      this.setState({ search: newSearch, page: 1, images: [] });
     }
   };
 
   handleClick = () => {
-    this.setState(prevState => ({ currentPage: prevState.currentPage + 1 }));
+    this.setState(prevState => ({ page: prevState.page + 1 }));
   };
 
   render() {
@@ -95,13 +96,13 @@ export class App extends Component {
         {/* Render ImageGallery Component when there is atleast one match of images */}
         {images.length >= 1 && <ImageGallery photos={images} />}
 
-        {/* Render Button Component when there is atleast a currentPage or more and it's not the end of currentPage */}
+        {/* Render Button Component when there is atleast a page or more and it's not the end of page */}
         {images.length >= 1 && !isEnd && <Button onClick={this.handleClick} />}
         {isLoading && <h2>Loading......</h2>}
         {isError &&
-          toast.error('Oops, something went wrong! Reload this currentPage!')}
+          toast.error('Oops, something went wrong! Reload this page!')}
 
-        <Toaster position="top-center" reverseOrder={false} />
+        <Toaster position="top-right" reverseOrder={false} />
       </div>
     );
   }
