@@ -24,7 +24,11 @@ class ImageModal extends Component {
   render() {
     const { image, tags } = this.props;
     return (
-      <Modal isOpen={true} style={customStyles}>
+      <Modal
+        isOpen={true}
+        style={customStyles}
+        shouldCloseOnOverlayClick={false}
+      >
         <img
           src={image}
           alt={tags}
