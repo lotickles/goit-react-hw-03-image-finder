@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import Modal from '../Modal/Modal';
+import ImageModal from '../Modal/ImageModal';
 import css from './ImageGalleryItem.module.css';
 
 class ImageGalleryItem extends Component {
@@ -43,9 +43,13 @@ class ImageGalleryItem extends Component {
 
     return (
       <li className={css.galleryItem} onClick={this.toggleModal}>
-        <img src={webformatURL} alt={tags} />
+        <img src={webformatURL} alt={tags} loading="lazy" />
         {showModal && (
-          <Modal image={largeImageURL} tags={tags} onClose={this.toggleModal} />
+          <ImageModal
+            image={largeImageURL}
+            tags={tags}
+            onClose={this.toggleModal}
+          />
         )}
       </li>
     );

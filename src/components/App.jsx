@@ -6,6 +6,9 @@ import Loader from './Loader/Loader';
 import { getAPI } from 'pixabay-api';
 import css from './App.module.css';
 import toast, { Toaster } from 'react-hot-toast';
+import Modal from 'react-modal';
+
+Modal.setAppElement('#root');
 
 class App extends Component {
   state = {
@@ -26,6 +29,7 @@ class App extends Component {
       prevState.currentPage !== currentPage
     ) {
       await this.fetchImages();
+      this.setState(prevState => ({ ...prevState, isLoading: false }));
     }
   }
 
@@ -106,6 +110,7 @@ class App extends Component {
         searchQuery: normalizedQuery,
         currentPage: 1,
         images: [],
+        isLoading: true,
         isEnd: false,
       });
     }
@@ -123,16 +128,23 @@ class App extends Component {
   render() {
     const { images, isLoading, isError, isEnd } = this.state;
     return (
-      <div className={css.styleApp}>
-        <Searchbar onSubmit={this.handleSearchSubmit} />
-        <ImageGallery images={images} />
+      <>
+        <div className={css.styleApp}>
+          <Searchbar onSubmit={this.handleSearchSubmit} />
+          {/* <Loader /> */}
+          {isLoading && <Loader />}
+          <div style={{ position: 'relative' }}>
+            <ImageGallery images={images} />
+
+            {!isLoading && !isError && images.length > 0 && !isEnd && (
+              <Button onClick={this.handleLoadMore} />
+            )}
+            {isError && <p>Something went wrong. Please try again later.</p>}
+            <Toaster position="top-right" reverseOrder={false} />
+          </div>
+        </div>
         {isLoading && <Loader />}
-        {!isLoading && !isError && images.length > 0 && !isEnd && (
-          <Button onClick={this.handleLoadMore} />
-        )}
-        {isError && <p>Something went wrong. Please try again later.</p>}
-        <Toaster position="top-center" reverseOrder={false} />
-      </div>
+      </>
     );
   }
 }
