@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { ThreeDots } from 'react-loader-spinner';
-import css from './Loader.module.css';
 import Modal from 'react-modal';
 
 const customStyles = {
